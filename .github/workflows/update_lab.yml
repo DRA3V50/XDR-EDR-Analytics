@@ -2,9 +2,9 @@ name: XDR Lab Twice Daily Update
 
 on:
   schedule:
-    # Morning run at 8 AM EST
+    # Morning run at 8 AM EST → 13:00 UTC
     - cron: '0 13 * * *'
-    # Evening run at 8 PM EST
+    # Evening run at 8 PM EST → 01:00 UTC
     - cron: '0 01 * * *'
   push:
     branches:
@@ -14,29 +14,39 @@ jobs:
   run-lab:
     runs-on: ubuntu-latest
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      # 3️⃣ Install Python dependencies
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pandas matplotlib jinja2
 
+      # 4️⃣ Install dotnet-script for single-file C# execution
+      - name: Install dotnet-script
+        run: dotnet tool install -g dotnet-script
+
+      # 5️⃣ Run KQL Validator
       - name: Run KQL Validator
         run: python tooling/validate_kql.py
 
-      - name: Run Telemetry Parser (C#)
-        run: |
-          dotnet run --project tooling/telemetry_parser.csproj
+      # 6️⃣ Run Telemetry Parser (C# single-file)
+      - name: Run Telemetry Parser
+        run: dotnet-script tooling/telemetry_parser.cs
 
+      # 7️⃣ Generate Dashboards
       - name: Generate Dashboards
         run: python tooling/generate_dashboards.py
 
+      # 8️⃣ Commit Updated Dashboards
       - name: Commit Updated Dashboards
         run: |
           git config --global user.name "github-actions[bot]"
