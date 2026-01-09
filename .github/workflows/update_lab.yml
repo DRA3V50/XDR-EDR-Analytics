@@ -1,8 +1,7 @@
 name: Update XDR Lab
 
-# Triggers
 on:
-  workflow_dispatch:   # Allows manual run
+  workflow_dispatch:   # Manual trigger
   schedule:
     # Runs twice daily at 8 AM and 8 PM EST (13:00 and 01:00 UTC)
     - cron: '0 13 * * *'
@@ -11,6 +10,7 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       # 1. Checkout repo
       - name: Checkout repository
@@ -28,11 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt || echo "No requirements.txt found"
 
-      # 4. Run Python telemetry parser (if using validate_kql.py, run it here)
+      # 4. Validate KQL scripts (optional)
       - name: Validate KQL scripts
         run: python tooling/validate_kql.py
 
-      # 5. Generate dashboards (XDR-focused)
+      # 5. Generate XDR dashboards
       - name: Generate XDR dashboards
         run: python tooling/generate_dashboards.py
 
@@ -40,12 +40,12 @@ jobs:
       - name: Add timestamp
         run: python tooling/add_timestamp.py
 
-      # 7. Commit and push updated dashboards
+      # 7. Commit and push updated dashboards using PAT
       - name: Commit updated dashboards
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add dashboards/
           git commit -m "Update dashboards: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
-          git push
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/DRA3V50/XDR-Endpoint-Detections.git HEAD:main
 
