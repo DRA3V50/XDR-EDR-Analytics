@@ -1,49 +1,38 @@
-name: Daily Telemetry & Dashboard Update
+name: Update Dashboards
 
-# Trigger manually and on push
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch:      # Manual trigger
+  schedule:
+    - cron: '0 10,22 * * *'  # Daily at 10:00AM & 10:00PM UTC (~5AM & 5PM EST)
 
 jobs:
-  update:
+  update_dashboard:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PAT_Sim_Token }}
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
 
-      - name: Install dependencies
-        run: |
-          pip install pandas matplotlib sqlite3 --upgrade
+    - name: Install dependencies
+      run: pip install matplotlib
 
-      - name: Ensure folders exist
-        run: |
-          mkdir -p data dashboards sql
+    - name: Generate telemetry
+      run: python tooling/generate_telemetry.py
 
-      - name: Generate telemetry
-        run: python tooling/generate_telemetry.py
+    - name: Generate dashboards
+      run: python tooling/generate_dashboards.py
 
-      - name: Calculate risk
-        run: python tooling/calculate_risk.py
-
-      - name: Generate dashboards
-        run: python tooling/generate_dashboards.py
-
-      - name: Commit and push dashboards
-        run: |
-          git config user.name "XDR-Automation"
-          git config user.email "xdr-automation@example.com"
-          git add dashboards/dashboard.svg sql/endpoint_telemetry.db
-          git commit -m "Update dashboards and telemetry: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" || echo "Nothing to commit"
-          git push https://$PAT_Sim_Token@github.com/DRA3V50/XDR-EDR-Analytics.git HEAD:main
-        env:
-          PAT_Sim_Token: ${{ secrets.PAT_Sim_Token }}
+    - name: Commit updated dashboards
+      run: |
+        git config user.name "XDR-Automation"
+        git config user.email "actions@github.com"
+        git add dashboards/dashboard.svg
+        git commit -m "Update dashboards: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
+        git push
