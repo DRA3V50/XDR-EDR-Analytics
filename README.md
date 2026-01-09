@@ -1,61 +1,55 @@
-# XDR-EDR-Analytics 🚨
+# XDR-EDR-Analytics 🌌
 
-**Live Endpoint Threat Simulation & Analytics for Blue Team Operations**
+**Real-Time Endpoint Threat Simulation & Risk Visualization for Blue Teams**
 
 ---
 
 ## 🔹 Purpose
-XDR-EDR-Analytics is designed to simulate **endpoint telemetry** and **risk assessment** for hosts in a corporate environment. The repository focuses on providing **realistic, automated data** to help blue team analysts visualize endpoint activity and identify risky hosts.  
+XDR-EDR-Analytics simulates **endpoint activity** in a realistic corporate environment to help security analysts visualize and understand host risk.  
+Designed for **blue team training, analytics, and trend monitoring**, it emphasizes **live, automated, and insightful endpoint telemetry**.  
 
-- Simulates **realistic endpoint events** like failed logins, suspicious processes, and PowerShell abuse  
-- Assigns **risk scores** to each host based on detected events  
-- Builds **live dashboards** (SVG charts) to track host risk trends over time  
-- Fully automated with **Python + SQLite + Matplotlib + GitHub Actions**
+- Simulates **auth failures, suspicious processes, PowerShell misuse, and other endpoint anomalies**  
+- Calculates **risk scores per host** based on event frequency and severity  
+- Generates **dark-mode dashboards** that update daily  
+- Fully automated using **Python, SQLite, Matplotlib, and GitHub Actions**  
 
 ---
 
-## 📊 Simulation Workflow
-### 1️⃣ Telemetry Generation
-Generates **simulated endpoint events** for multiple hosts. Events include:
-- Login failures and abnormal access patterns  
-- Execution of potentially malicious processes  
-- PowerShell misuse or suspicious scripts  
+## 📊 How It Works
 
-All data is stored in a **SQLite database** to preserve history.
+### 1️⃣ Telemetry Simulation
+- Produces **realistic endpoint events** for multiple hosts  
+- Stores all activity in a **persistent SQLite database** to track trends over time  
 
 ### 2️⃣ Risk Scoring
-Each host is assigned a **dynamic risk score** based on the events it generates. Risk scores reflect:
-- Frequency of suspicious activity  
-- Severity of endpoint events  
-- Trends over time for each host  
+- Computes **dynamic host risk scores** based on detected behaviors  
+- Accounts for **severity and frequency** of suspicious activities  
 
-### 3️⃣ Dashboard Creation
-A **visual dashboard (SVG)** is created for each run, summarizing:
-- Host risk scores  
-- Daily trends in suspicious activity  
-- Visual alerts for high-risk endpoints  
+### 3️⃣ Dashboard Visualization
+- Creates a **dark-mode SVG dashboard**  
+- Shows **host risk trends**, **high-risk endpoints**, and overall activity  
+- Removes unnecessary UI clutter like colored legend squares  
+- Designed for **visual clarity and blue-team readability**  
 
-The dashboard is **automatically updated** and committed to the repository daily.
-
-### 4️⃣ Automation & Updates
-- GitHub Actions executes the scripts **twice daily** or manually on demand  
-- The live dashboard in the README always displays the **latest generated SVG**  
-- Historical telemetry data is **retained** to allow trend analysis  
+### 4️⃣ Automation
+- GitHub Actions runs the simulation **twice daily** or manually on demand  
+- **Latest dashboard is always displayed in the README**  
+- Historical data is **retained for trend analysis**, never deleted  
 
 ---
 
 ## ⚡ Live Dashboard
 ![Live Endpoint Risk Dashboard](dashboards/dashboard.svg)  
-*This chart updates automatically as new telemetry is generated.*
+*Automatically updates with new telemetry and risk scores.*
 
 ---
 
-## 🔍 Blue Team Insights
-- Quickly identify **hosts with elevated risk**  
-- Track **endpoint behavior trends** over time  
-- Simulate realistic detection and analytics scenarios  
-- Strengthen **incident response readiness** with live data visualization
+## 🔍 Analyst Insights
+- Instantly identify **high-risk hosts**  
+- Monitor **endpoint activity trends** over time  
+- Practice **incident response and risk prioritization** with live simulated data  
+- Train teams using **realistic, continuously updating datasets**
 
 ---
 
-XDR-EDR-Analytics offers a **hands-on environment** to simulate real-world endpoint telemetry, calculate risk scores, and visualize results—**all fully automated** to mimic continuous monitoring operations.
+**XDR-EDR-Analytics** combines **automation, live data, and visualization** into a polished tool for security operations, threat detection, and blue-team readiness.
