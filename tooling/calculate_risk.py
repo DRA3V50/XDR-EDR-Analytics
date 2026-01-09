@@ -1,17 +1,17 @@
 import sqlite3
 import pandas as pd
 
-db_path = 'sql/endpoint_telemetry.db'
-conn = sqlite3.connect(db_path)
+conn = sqlite3.connect('../sql/endpoint_telemetry.db')
 
-# Load telemetry
-df = pd.read_sql_query("SELECT * FROM telemetry", conn)
+# Load telemetry data
+df = pd.read_sql_query('SELECT * FROM telemetry', conn)
 
-# Simple risk score: sum of severity per host
+# Calculate risk per host (sum of severity)
 risk_df = df.groupby('host')['severity'].sum().reset_index()
-risk_df.rename(columns={'severity': 'risk_score'}, inplace=True)
+risk_df = risk_df.rename(columns={'severity': 'risk_score'})
 
-# Save risk scores for dashboard
-risk_df.to_csv('data/risk_scores.csv', index=False)
+# Save risk scores to a separate table
+risk_df.to_sql('host_risk', conn, if_exists='replace', index=False)
+
 conn.close()
-print("✅ Risk calculated")
+print("Risk scores calculated.")
