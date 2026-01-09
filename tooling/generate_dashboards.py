@@ -1,32 +1,38 @@
+import os
 import sqlite3
 import matplotlib.pyplot as plt
 
+# Ensure dashboards folder exists
+os.makedirs('../dashboards', exist_ok=True)
 DB_FILE = '../sql/endpoint_telemetry.db'
-SVG_FILE = '../dashboards/dashboard.svg'
+DASHBOARD_FILE = '../dashboards/dashboard.svg'
 
-# Load risk scores
+# Connect DB
 conn = sqlite3.connect(DB_FILE)
-c = conn.cursor()
-c.execute('SELECT host, risk_score FROM host_risk ORDER BY risk_score DESC')
-data = c.fetchall()
+cursor = conn.cursor()
+
+# Get host risk scores
+cursor.execute('SELECT host, risk_score FROM host_risk')
+data = cursor.fetchall()
 conn.close()
 
 if not data:
-    print("No data to plot")
+    print("⚠️ No risk data found. Run calculate_risk.py first.")
     exit()
 
 hosts, scores = zip(*data)
 
-# Dark mode plotting
+# Plot dark-mode dashboard
 plt.style.use('dark_background')
-fig, ax = plt.subplots(figsize=(10,6))
-bars = ax.bar(hosts, scores, color='#ff5555')
-ax.set_title('Endpoint Risk Scores', fontsize=18)
-ax.set_ylabel('Risk Score', fontsize=14)
-ax.set_xlabel('Host', fontsize=14)
-ax.set_facecolor('#121212')
-fig.patch.set_facecolor('#121212')
-plt.xticks(rotation=45)
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.bar(hosts, scores, color='#FF6F61')
+ax.set_title('Endpoint Risk Dashboard', fontsize=16)
+ax.set_ylabel('Risk Score')
+ax.set_xlabel('Host')
+ax.grid(True, linestyle='--', alpha=0.5)
 plt.tight_layout()
-plt.savefig(SVG_FILE, format='svg')
+
+# Save as SVG
+plt.savefig(DASHBOARD_FILE, format='svg')
 plt.close()
+print(f"✅ Dashboard generated at {DASHBOARD_FILE}")
