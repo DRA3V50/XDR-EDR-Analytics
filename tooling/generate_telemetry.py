@@ -1,9 +1,13 @@
 import sqlite3
+import os
+from datetime import datetime, timedelta
 import random
-import datetime
 
-# Connect to telemetry database
-conn = sqlite3.connect('../sql/endpoint_telemetry.db')
+# Ensure sql folder exists
+os.makedirs('sql', exist_ok=True)
+
+db_path = 'sql/endpoint_telemetry.db'
+conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # Create table if not exists
@@ -16,17 +20,17 @@ CREATE TABLE IF NOT EXISTS telemetry (
 )
 ''')
 
-# Sample hosts and events
-hosts = ['HOST-01','HOST-02','HOST-03','HOST-04','HOST-05']
-events = ['Failed Login','Suspicious Process','PowerShell Abuse','Anomaly Detected']
+# Generate random telemetry
+hosts = [f"HOST-{i:02}" for i in range(1, 6)]
+events = ["Failed Login", "Suspicious Process", "PowerShell Abuse", "Anomaly Detected"]
 
-# Insert random telemetry
-now = datetime.datetime.utcnow()
-for _ in range(20):  # 20 events per run
+for _ in range(10):  # generate 10 events per run
+    timestamp = datetime.utcnow() - timedelta(minutes=random.randint(0, 60))
     host = random.choice(hosts)
     event = random.choice(events)
-    severity = random.randint(1,10)
-    cursor.execute('INSERT INTO telemetry VALUES (?,?,?,?)', (now.isoformat(), host, event, severity))
+    severity = random.randint(1, 10)
+    cursor.execute("INSERT INTO telemetry VALUES (?, ?, ?, ?)", (timestamp.isoformat(), host, event, severity))
 
 conn.commit()
 conn.close()
+print("✅ Telemetry generated")
