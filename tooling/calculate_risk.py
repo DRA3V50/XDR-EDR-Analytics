@@ -2,9 +2,10 @@ import os
 import sqlite3
 
 # Ensure SQL folder exists
-os.makedirs('../sql', exist_ok=True)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.makedirs(os.path.join(BASE_DIR, 'sql'), exist_ok=True)
+DB_FILE = os.path.join(BASE_DIR, 'sql', 'endpoint_telemetry.db')
 
-DB_FILE = '../sql/endpoint_telemetry.db'
 conn = sqlite3.connect(DB_FILE)
 cursor = conn.cursor()
 
