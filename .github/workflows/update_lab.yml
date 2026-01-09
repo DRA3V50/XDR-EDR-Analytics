@@ -38,7 +38,7 @@ jobs:
       - name: Run KQL Validator
         run: python tooling/validate_kql.py
 
-      # 6️⃣ Run Telemetry Parser (C# single-file)
+      # 6️⃣ Run Telemetry Parser (C# single-file with Newtonsoft)
       - name: Run Telemetry Parser
         run: dotnet-script tooling/telemetry_parser.cs
 
@@ -54,3 +54,4 @@ jobs:
           git add dashboards/*.svg web/*.html
           git commit -m "Update dashboards [skip ci]" || echo "No changes"
           git push
+
