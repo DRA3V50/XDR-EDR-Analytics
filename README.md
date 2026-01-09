@@ -1,36 +1,37 @@
-# XDR-EDR-Analytics 🛡️
+# XDR-EDR-Analytics 🚨
 
-**Endpoint Detection & Risk Dashboards — Live & Automated**  
-Simulates real-world endpoint monitoring using Python + SQL, with live dashboards updated daily.
-
----
-
-## 🌐 What It Does
-
-- Generates **endpoint telemetry**: failed logins, suspicious processes, PowerShell abuse.  
-- Calculates **risk scores per host** to highlight priority endpoints.  
-- Produces **live dashboards** (SVG/PNG) showing trends, top hosts, and risk over time.  
-- Updates **twice daily automatically**, or manually on demand.  
-- Keeps **historical data**, so nothing is overwritten.
+**Live Endpoint Threat Analytics for Blue Team Operations**
 
 ---
 
-## 📊 Features
+## 🔹 What it Does
+This repository simulates **endpoint telemetry** and calculates **risk scores** for hosts in your environment. Using Python + SQLite + Matplotlib, it:
 
-- **Live Dashboards**: Auto-generated charts show risk trends, top risky endpoints, and alert counts.  
-- **Blue Team Analytics**: SQL storage allows querying and analyzing telemetry over time.  
-- **Automation**: Python scripts handle telemetry, scoring, and dashboards; GitHub Actions runs them automatically.
-
----
-
-## 🛠️ Tech Stack
-
-Python 3.11 | SQL | Matplotlib / Plotly | GitHub Actions
+- Generates **random endpoint telemetry** each run
+- Calculates **risk scores per host**
+- Builds **live dashboards** (SVG charts) that update daily
+- Fully automated with **GitHub Actions**
 
 ---
 
-## 🔗 How to Explore
+## 📊 How It Works
+1. `generate_telemetry.py` → simulates endpoint events (failed logins, suspicious processes, PowerShell abuse)
+2. `calculate_risk.py` → computes a simple risk score per host
+3. `generate_dashboards.py` → creates a bar chart showing host risk
+4. **Workflow (`update_lab.yml`)** → runs scripts automatically twice per day (or manually) and commits updates
 
-- Check the `dashboards/` folder for live, auto-updating charts.  
-- Explore `tooling/` for Python scripts that simulate telemetry and calculate risk.  
-- Use `sql/` folder to store and query endpoint telemetry data.
+---
+
+## ⚡ Live Updates
+- Dashboard and telemetry **update daily automatically** via GitHub Actions
+- Historical data is **preserved** in `sql/endpoint_telemetry.db`
+- Dashboard saved in `dashboards/dashboard.svg`
+
+---
+
+## 🛠️ Usage
+```bash
+# Run locally
+python tooling/generate_telemetry.py
+python tooling/calculate_risk.py
+python tooling/generate_dashboards.py
