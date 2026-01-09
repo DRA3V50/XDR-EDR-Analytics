@@ -1,59 +1,11 @@
-name: XDR Lab Twice Daily Update
+name: Manual Trigger Test
 
 on:
-  workflow_dispatch:  # <-- top-level, enables manual run
-  schedule:
-    # Morning run at 8 AM EST → 13:00 UTC
-    - cron: '0 13 * * *'
-    # Evening run at 8 PM EST → 01:00 UTC
-    - cron: '0 01 * * *'
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  run-lab:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install Python Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas matplotlib jinja2
-
-      - name: Install dotnet-script
-        run: |
-          dotnet tool install -g dotnet-script
-          dotnet-script --version
-
-      - name: Run KQL Validator
-        run: python tooling/validate_kql.py
-
-      - name: Run Telemetry Parser
-        run: dotnet-script tooling/telemetry_parser.cs --verbose
-
-      - name: Generate Dashboards with Timestamp
-        run: |
-          python tooling/generate_dashboards.py
-          python - <<EOF
-from datetime import datetime
-index_file = "web/index.html"
-with open(index_file, "a") as f:
-    f.write(f"\n<!-- Last updated: {datetime.now()} -->\n")
-EOF
-
-      - name: Commit Updated Dashboards
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add dashboards/*.svg web/*.html
-          git commit -m "Update dashboards [skip ci]" || echo "No changes"
-          git push
-
+      - name: Say Hello
+        run: echo "Manual trigger is working!"
