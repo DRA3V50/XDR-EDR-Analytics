@@ -1,6 +1,6 @@
 # XDR-EDR-Analytics 🛡️
 
-**Real-Time Endpoint Threat Simulation & Risk Visualization for Blue Teams**
+**Real-Time Endpoint Threat & Risk Visualization for Blue Teams**
 
 ---
 
