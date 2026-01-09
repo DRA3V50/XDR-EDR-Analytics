@@ -1,27 +1,31 @@
-import pandas as pd
-import matplotlib.pyplot as plt
+import sqlite3
 import os
+import matplotlib.pyplot as plt
 
-# Ensure dashboards folder exists
-os.makedirs('dashboards', exist_ok=True)
+# Paths
+DB_PATH = os.path.join(os.path.dirname(__file__), '../sql/endpoint_telemetry.db')
+DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), '../dashboards/dashboard.svg')
 
-# Load risk scores
-risk_file = 'data/risk_scores.csv'
-if not os.path.exists(risk_file):
-    print("⚠️ No risk data found. Skipping dashboard generation.")
-    exit()
+# Connect to DB
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
 
-df = pd.read_csv(risk_file)
+# Count events by severity
+cursor.execute("SELECT severity, COUNT(*) FROM telemetry GROUP BY severity")
+data = dict(cursor.fetchall())
+conn.close()
 
-# Create a simple bar chart of risk scores
-plt.figure(figsize=(8,6))
-plt.bar(df['host'], df['risk_score'], color='crimson')
-plt.title("Endpoint Risk Scores")
-plt.xlabel("Host")
-plt.ylabel("Risk Score")
-plt.tight_layout()
+# Fill missing keys
+for key in ['Low', 'Medium', 'High']:
+    if key not in data:
+        data[key] = 0
 
-# Save dashboard
-plt.savefig('dashboards/dashboard.svg')
+# Plot pie chart
+plt.figure(figsize=(6,6))
+plt.pie([data['Low'], data['Medium'], data['High']], 
+        labels=['Low 🟢','Medium 🟠','High 🔴'], 
+        autopct='%1.1f%%',
+        colors=['#2ecc71','#f39c12','#e74c3c'])
+plt.title("Endpoint Event Severity Distribution")
+plt.savefig(DASHBOARD_PATH, format='svg')
 plt.close()
-print("✅ Dashboard generated")
