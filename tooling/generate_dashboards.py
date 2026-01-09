@@ -1,25 +1,32 @@
 import sqlite3
-import pandas as pd
 import matplotlib.pyplot as plt
 
-plt.style.use('dark_background')  # Dark theme
+DB_FILE = '../sql/endpoint_telemetry.db'
+SVG_FILE = '../dashboards/dashboard.svg'
 
-conn = sqlite3.connect('../sql/endpoint_telemetry.db')
-df = pd.read_sql_query('SELECT * FROM host_risk', conn)
+# Load risk scores
+conn = sqlite3.connect(DB_FILE)
+c = conn.cursor()
+c.execute('SELECT host, risk_score FROM host_risk ORDER BY risk_score DESC')
+data = c.fetchall()
 conn.close()
 
-hosts = df['host'].tolist()
-risks = df['risk_score'].tolist()
+if not data:
+    print("No data to plot")
+    exit()
 
-fig, ax = plt.subplots(figsize=(8,5))
-ax.bar(hosts, risks, color='#1f77b4')  # Single color for simplicity
-ax.set_title("Endpoint Risk Scores", fontsize=16, color='white')
-ax.set_ylabel("Risk Score", color='white')
-ax.set_xlabel("Hosts", color='white')
-ax.tick_params(axis='x', colors='white')
-ax.tick_params(axis='y', colors='white')
+hosts, scores = zip(*data)
 
+# Dark mode plotting
+plt.style.use('dark_background')
+fig, ax = plt.subplots(figsize=(10,6))
+bars = ax.bar(hosts, scores, color='#ff5555')
+ax.set_title('Endpoint Risk Scores', fontsize=18)
+ax.set_ylabel('Risk Score', fontsize=14)
+ax.set_xlabel('Host', fontsize=14)
+ax.set_facecolor('#121212')
+fig.patch.set_facecolor('#121212')
+plt.xticks(rotation=45)
 plt.tight_layout()
-plt.savefig('dashboards/dashboard.svg', transparent=True)
+plt.savefig(SVG_FILE, format='svg')
 plt.close()
-print("Dashboard generated.")
