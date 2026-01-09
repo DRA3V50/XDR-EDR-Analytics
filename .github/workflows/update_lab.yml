@@ -1,22 +1,24 @@
-name: XDR Lab Twice Daily Update
+name: XDR Lab Update
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # Manual run button
   schedule:
-    - cron: '0 13 * * *'  # 8 AM EST
-    - cron: '0 01 * * *'  # 8 PM EST
+    # 8 AM EST → 13:00 UTC
+    - cron: '0 13 * * *'
+    # 8 PM EST → 01:00 UTC
+    - cron: '0 01 * * *'
   push:
     branches:
       - main
 
 jobs:
-  run-lab:
+  update-xdr-lab:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Python 3.11
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
@@ -37,11 +39,11 @@ jobs:
       - name: Run telemetry parser (C#)
         run: dotnet-script tooling/telemetry_parser.cs --verbose
 
-      - name: Generate dashboards with timestamp
-        run: |
-          python tooling/generate_dashboards.py
-          python -c "from datetime import datetime; index_file = 'web/index.html'; \
-with open(index_file, 'a') as f: f.write(f'\n<!-- Last updated: {datetime.now()} -->\n')"
+      - name: Generate dashboards
+        run: python tooling/generate_dashboards.py
+
+      - name: Add timestamp to dashboard
+        run: python tooling/add_timestamp.py
 
       - name: Commit updated dashboards
         run: |
@@ -50,3 +52,4 @@ with open(index_file, 'a') as f: f.write(f'\n<!-- Last updated: {datetime.now()}
           git add dashboards/*.svg web/*.html
           git commit -m "Update dashboards [skip ci]" || echo "No changes to commit"
           git push
+
