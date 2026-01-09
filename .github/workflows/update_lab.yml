@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo using your PAT
+      # 1. Checkout repo using PAT
       - name: Checkout repository using PAT
         uses: actions/checkout@v3
         with:
@@ -38,7 +38,7 @@ jobs:
       - name: Generate XDR dashboards
         run: python tooling/generate_dashboards.py || echo "Dashboard generation skipped if script missing"
 
-      # 6. Add timestamp to dashboards
+      # 6. Add timestamp
       - name: Add timestamp
         run: python tooling/add_timestamp.py || echo "Timestamp skipped if script missing"
 
