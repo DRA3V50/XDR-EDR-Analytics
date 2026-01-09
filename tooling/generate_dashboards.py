@@ -1,17 +1,27 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
+import os
 
-df = pd.read_csv('../sql/risk_scores.csv')
+# Ensure dashboards folder exists
+os.makedirs('dashboards', exist_ok=True)
 
+# Load risk scores
+risk_file = 'data/risk_scores.csv'
+if not os.path.exists(risk_file):
+    print("⚠️ No risk data found. Skipping dashboard generation.")
+    exit()
+
+df = pd.read_csv(risk_file)
+
+# Create a simple bar chart of risk scores
 plt.figure(figsize=(8,6))
-plt.bar(df['host'], df['severity'], color='red')
-plt.title('Endpoint Risk Scores')
-plt.xlabel('Host')
-plt.ylabel('Risk Score')
+plt.bar(df['host'], df['risk_score'], color='crimson')
+plt.title("Endpoint Risk Scores")
+plt.xlabel("Host")
+plt.ylabel("Risk Score")
 plt.tight_layout()
 
-# Save SVG with timestamp
-timestamp = datetime.utcnow().strftime('%Y%m%d-%H%M%S')
-plt.savefig(f'../dashboards/dashboard_{timestamp}.svg')
-print(f'Dashboard generated: dashboards/dashboard_{timestamp}.svg')
+# Save dashboard
+plt.savefig('dashboards/dashboard.svg')
+plt.close()
+print("✅ Dashboard generated")
