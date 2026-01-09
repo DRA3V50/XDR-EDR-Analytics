@@ -1,42 +1,51 @@
 name: Update XDR Dashboard
 
+# Trigger manually or on schedule
 on:
-  workflow_dispatch:   # Manual run
+  workflow_dispatch:   # Allows manual run
   schedule:
-    - cron: '0 10,22 * * *' # UTC: 10:00 and 22:00 → roughly EST morning + night
+    - cron: '0 13,1 * * *' # Runs at 8 AM and 8 PM EST daily (adjust if needed)
 
 jobs:
-  update-dashboard:
+  update_dashboard:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout repository using PAT token
+      - name: Checkout repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.PAT_Sim_Token }}
 
+      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      # 3️⃣ Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install matplotlib
+          pip install matplotlib pandas sqlite3
 
+      # 4️⃣ Generate endpoint telemetry
       - name: Generate Telemetry
         run: python tooling/generate_telemetry.py
 
+      # 5️⃣ Calculate risk scores per host
       - name: Calculate Risk
         run: python tooling/calculate_risk.py
 
+      # 6️⃣ Generate dashboard
       - name: Generate Dashboard
         run: python tooling/generate_dashboards.py
 
-      - name: Commit and Push Updates
+      # 7️⃣ Commit updated dashboards
+      - name: Commit dashboard updates
         run: |
-          git config user.name "XDR-Automation"
-          git config user.email "xdr-automation@example.com"
+          git config --local user.email "xdr-bot@github.com"
+          git config --local user.name "XDR-Automation"
           git add dashboards/dashboard.svg sql/endpoint_telemetry.db
-          git commit -m "Update dashboard: $(date -u)" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.PAT_Sim_Token }}@github.com/DRA3V50/XDR-EDR-Analytics.git main
+          git commit -m "Update dashboards: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || echo "No changes to commit"
+          git push origin main
