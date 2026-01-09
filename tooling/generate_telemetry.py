@@ -1,53 +1,41 @@
 import sqlite3
-import csv
-import os
-from datetime import datetime
 import random
+from datetime import datetime
 
-# Paths
-DB_PATH = os.path.join(os.path.dirname(__file__), '../sql/endpoint_telemetry.db')
-CSV_PATH = os.path.join(os.path.dirname(__file__), '../data/sample_telemetry.csv')
-
-# Create SQL DB if it doesn't exist
-conn = sqlite3.connect(DB_PATH)
+# Connect to persistent database
+conn = sqlite3.connect('../sql/endpoint_telemetry.db')
 cursor = conn.cursor()
 
-# Create table
+# Create table if not exists
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS telemetry (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    device TEXT,
-    user TEXT,
-    event_type TEXT,
-    severity TEXT,
+    host TEXT,
+    event TEXT,
+    severity INTEGER,
     timestamp TEXT
 )
 ''')
-conn.commit()
 
-# Generate dummy telemetry
-devices = ['PC-01', 'PC-02', 'Laptop-03', 'Server-01']
-users = ['alice', 'bob', 'charlie', 'eve']
-event_types = ['login', 'logout', 'file_access', 'malware_detected']
-severities = ['Low', 'Medium', 'High']
+hosts = ['Host-A', 'Host-B', 'Host-C', 'Host-D']
+events = [
+    'Failed login', 
+    'Suspicious PowerShell', 
+    'Malware detected', 
+    'Unauthorized process'
+]
 
-rows = []
-for _ in range(50):
-    row = (
-        random.choice(devices),
-        random.choice(users),
-        random.choice(event_types),
-        random.choice(severities),
-        datetime.utcnow().isoformat()
+# Simulate 5-15 events per run
+for _ in range(random.randint(5, 15)):
+    host = random.choice(hosts)
+    event = random.choice(events)
+    severity = random.randint(1, 10)  # 1 = low, 10 = critical
+    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    cursor.execute(
+        'INSERT INTO telemetry (host, event, severity, timestamp) VALUES (?, ?, ?, ?)',
+        (host, event, severity, timestamp)
     )
-    rows.append(row)
-    cursor.execute('INSERT INTO telemetry (device, user, event_type, severity, timestamp) VALUES (?, ?, ?, ?, ?)', row)
 
 conn.commit()
 conn.close()
-
-# Also generate a CSV copy (optional for debugging/backup)
-with open(CSV_PATH, 'w', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(['device','user','event_type','severity','timestamp'])
-    writer.writerows(rows)
+print(f"Telemetry generated at {datetime.utcnow()}")
