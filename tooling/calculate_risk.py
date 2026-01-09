@@ -1,17 +1,29 @@
 import sqlite3
-import pandas as pd
 
-conn = sqlite3.connect('../sql/endpoint_telemetry.db')
+DB_FILE = '../sql/endpoint_telemetry.db'
 
-# Load telemetry data
-df = pd.read_sql_query('SELECT * FROM telemetry', conn)
+# Severity weights
+weights = {'Low': 1, 'Medium': 3, 'High': 5}
 
-# Calculate risk per host (sum of severity)
-risk_df = df.groupby('host')['severity'].sum().reset_index()
-risk_df = risk_df.rename(columns={'severity': 'risk_score'})
+conn = sqlite3.connect(DB_FILE)
+c = conn.cursor()
 
-# Save risk scores to a separate table
-risk_df.to_sql('host_risk', conn, if_exists='replace', index=False)
+# Compute risk score per host
+risk_scores = {}
+c.execute('SELECT host, severity FROM telemetry')
+for host, severity in c.fetchall():
+    risk_scores[host] = risk_scores.get(host, 0) + weights[severity]
 
+# Store in a separate table
+c.execute('''
+CREATE TABLE IF NOT EXISTS host_risk (
+    host TEXT PRIMARY KEY,
+    risk_score INTEGER
+)
+''')
+
+for host, score in risk_scores.items():
+    c.execute('INSERT OR REPLACE INTO host_risk (host, risk_score) VALUES (?, ?)', (host, score))
+
+conn.commit()
 conn.close()
-print("Risk scores calculated.")
