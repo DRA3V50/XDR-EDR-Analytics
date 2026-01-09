@@ -7,7 +7,8 @@ from datetime import datetime
 os.makedirs('../sql', exist_ok=True)
 
 # Database file
-DB_FILE = '../sql/endpoint_telemetry.db'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_FILE = os.path.join(BASE_DIR, 'sql', 'endpoint_telemetry.db')
 
 # Connect to SQLite
 conn = sqlite3.connect(DB_FILE)
