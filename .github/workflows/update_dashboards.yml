@@ -1,39 +1,40 @@
-name: Update XDR Dashboard
+name: Update XDR-EDR-Analytics
 
-# Trigger manually or on schedule
+# Run manually or on a schedule
 on:
-  workflow_dispatch:   # Allows manual run
+  workflow_dispatch:
   schedule:
-    - cron: '0 13,1 * * *' # Runs at 8 AM and 8 PM EST daily (adjust if needed)
+    - cron: '0 10,22 * * *' # EST: 10:00 AM and 10:00 PM daily
 
 jobs:
-  update_dashboard:
+  update_lab:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository using PAT token
+      # 1️⃣ Checkout repository
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PAT_Sim_Token }}
+          token: ${{ secrets.PAT_Sim_Token }}  # Use your PAT secret
 
       # 2️⃣ Set up Python
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.11
 
       # 3️⃣ Install dependencies
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib pandas sqlite3
+          pip install matplotlib pandas
+          # sqlite3 is built-in; no need to install
 
-      # 4️⃣ Generate endpoint telemetry
+      # 4️⃣ Generate telemetry data
       - name: Generate Telemetry
         run: python tooling/generate_telemetry.py
 
-      # 5️⃣ Calculate risk scores per host
+      # 5️⃣ Calculate risk scores
       - name: Calculate Risk
         run: python tooling/calculate_risk.py
 
@@ -41,11 +42,14 @@ jobs:
       - name: Generate Dashboard
         run: python tooling/generate_dashboards.py
 
-      # 7️⃣ Commit updated dashboards
-      - name: Commit dashboard updates
+      # 7️⃣ Commit and push updates
+      - name: Commit and push updates
         run: |
-          git config --local user.email "xdr-bot@github.com"
-          git config --local user.name "XDR-Automation"
+          git config user.name "XDR-Automation"
+          git config user.email "xdr-automation@users.noreply.github.com"
           git add dashboards/dashboard.svg sql/endpoint_telemetry.db
-          git commit -m "Update dashboards: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || echo "No changes to commit"
+          git commit -m "Update dashboards: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_Sim_Token }}
+
