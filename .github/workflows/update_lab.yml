@@ -40,12 +40,11 @@ jobs:
       - name: Add timestamp
         run: python tooling/add_timestamp.py
 
-      # 7. Commit and push updated dashboards using PAT
+      # 7. Commit and push updated dashboards using your PAT
       - name: Commit updated dashboards
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "XDR-Automation"
+          git config user.email "xdr-bot@example.com"
           git add dashboards/
           git commit -m "Update dashboards: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/DRA3V50/XDR-Endpoint-Detections.git HEAD:main
-
+          git push https://x-access-token:${{ secrets.PAT_Sim_Token }}@github.com/DRA3V50/XDR-Endpoint-Detections.git HEAD:main
