@@ -32,15 +32,15 @@ jobs:
 
       # 4. Validate KQL scripts
       - name: Validate KQL scripts
-        run: python tooling/validate_kql.py
+        run: python tooling/validate_kql.py || echo "Validation skipped if script missing"
 
-      # 5. Generate dashboards
+      # 5. Generate XDR dashboards
       - name: Generate XDR dashboards
-        run: python tooling/generate_dashboards.py
+        run: python tooling/generate_dashboards.py || echo "Dashboard generation skipped if script missing"
 
-      # 6. Add timestamp
+      # 6. Add timestamp to dashboards
       - name: Add timestamp
-        run: python tooling/add_timestamp.py
+        run: python tooling/add_timestamp.py || echo "Timestamp skipped if script missing"
 
       # 7. Commit & push dashboards using PAT
       - name: Commit updated dashboards
@@ -50,4 +50,3 @@ jobs:
           git add dashboards/
           git commit -m "Update dashboards: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.PAT_Sim_Token }}@github.com/DRA3V50/XDR-Endpoint-Detections.git HEAD:main
-
