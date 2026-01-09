@@ -1,6 +1,7 @@
 name: XDR Lab Twice Daily Update
 
 on:
+  workflow_dispatch:  # Allows manual run from GitHub Actions tab
   schedule:
     # Morning run at 8 AM EST → 13:00 UTC
     - cron: '0 13 * * *'
@@ -42,9 +43,17 @@ jobs:
       - name: Run Telemetry Parser
         run: dotnet-script tooling/telemetry_parser.cs
 
-      # 7️⃣ Generate Dashboards
+      # 7️⃣ Generate Dashboards with timestamp to force git changes
       - name: Generate Dashboards
-        run: python tooling/generate_dashboards.py
+        run: |
+          python tooling/generate_dashboards.py
+          # Add timestamp to index.html to ensure Git sees changes
+          python - <<EOF
+from datetime import datetime
+index_file = "web/index.html"
+with open(index_file, "a") as f:
+    f.write(f"\n<!-- Last updated: {datetime.now()} -->\n")
+EOF
 
       # 8️⃣ Commit Updated Dashboards
       - name: Commit Updated Dashboards
