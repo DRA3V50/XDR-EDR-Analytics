@@ -1,3 +1,8 @@
+#r "nuget: Newtonsoft.Json, 13.0.3"
+
+using System;
+using System.IO;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
