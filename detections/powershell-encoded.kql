@@ -1,1 +1,4 @@
-
+DeviceProcessEvents
+| where ProcessName =~ "powershell.exe"
+| where ProcessCommandLine has "-enc"
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessName
