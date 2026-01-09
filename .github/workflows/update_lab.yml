@@ -1,12 +1,10 @@
 name: XDR Lab Twice Daily Update
 
 on:
-  workflow_dispatch:    # Enables manual trigger button
+  workflow_dispatch:
   schedule:
-    # 8 AM EST (13:00 UTC)
-    - cron: '0 13 * * *'
-    # 8 PM EST (01:00 UTC next day)
-    - cron: '0 01 * * *'
+    - cron: '0 13 * * *'  # 8 AM EST
+    - cron: '0 01 * * *'  # 8 PM EST
   push:
     branches:
       - main
