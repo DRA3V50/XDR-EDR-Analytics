@@ -1,31 +1,25 @@
 import sqlite3
-import os
+import pandas as pd
 import matplotlib.pyplot as plt
 
-# Paths
-DB_PATH = os.path.join(os.path.dirname(__file__), '../sql/endpoint_telemetry.db')
-DASHBOARD_PATH = os.path.join(os.path.dirname(__file__), '../dashboards/dashboard.svg')
+plt.style.use('dark_background')  # Dark theme
 
-# Connect to DB
-conn = sqlite3.connect(DB_PATH)
-cursor = conn.cursor()
-
-# Count events by severity
-cursor.execute("SELECT severity, COUNT(*) FROM telemetry GROUP BY severity")
-data = dict(cursor.fetchall())
+conn = sqlite3.connect('../sql/endpoint_telemetry.db')
+df = pd.read_sql_query('SELECT * FROM host_risk', conn)
 conn.close()
 
-# Fill missing keys
-for key in ['Low', 'Medium', 'High']:
-    if key not in data:
-        data[key] = 0
+hosts = df['host'].tolist()
+risks = df['risk_score'].tolist()
 
-# Plot pie chart
-plt.figure(figsize=(6,6))
-plt.pie([data['Low'], data['Medium'], data['High']], 
-        labels=['Low 🟢','Medium 🟠','High 🔴'], 
-        autopct='%1.1f%%',
-        colors=['#2ecc71','#f39c12','#e74c3c'])
-plt.title("Endpoint Event Severity Distribution")
-plt.savefig(DASHBOARD_PATH, format='svg')
+fig, ax = plt.subplots(figsize=(8,5))
+ax.bar(hosts, risks, color='#1f77b4')  # Single color for simplicity
+ax.set_title("Endpoint Risk Scores", fontsize=16, color='white')
+ax.set_ylabel("Risk Score", color='white')
+ax.set_xlabel("Hosts", color='white')
+ax.tick_params(axis='x', colors='white')
+ax.tick_params(axis='y', colors='white')
+
+plt.tight_layout()
+plt.savefig('dashboards/dashboard.svg', transparent=True)
 plt.close()
+print("Dashboard generated.")
