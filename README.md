@@ -25,7 +25,7 @@ Built for **blue team training, analytics, and trend monitoring**, it emphasizes
 
 ## 📈 Live Dashboard
 ![Endpoint Risk Dashboard](dashboards/dashboard.svg)  
-*Automatically updates twice daily with new telemetry and risk scores.*
+*⚠️Automatically updates twice daily with new telemetry and risk scores.*
 
 ---
 
