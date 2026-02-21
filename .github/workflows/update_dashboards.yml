@@ -4,7 +4,7 @@ name: Update XDR-EDR-Analytics
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 10,22 * * *' # EST: 10:00 AM and 10:00 PM daily
+    - cron: '0 12,24 * * *' # EST: 12:00 AM and 12:00 PM daily
 
 jobs:
   update_lab:
